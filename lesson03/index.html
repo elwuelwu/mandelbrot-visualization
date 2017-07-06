@@ -18,28 +18,40 @@
     void pow2(in vec2 a, out vec2 b) {
 		b = vec2(a.x*a.x-a.y*a.y, 2.0*a.x*a.y);
 	}
-	
+	//m = iter_count - log (log escape_radius) /log 2
     void main(void) {
-		vec2 xy = vec2(gl_FragCoord.x/uCanvasW-0.5, gl_FragCoord.y/uCanvasH-0.5);
-		xy = exp(-0.001*time)*xy+vec2(-0.7475,0.0741);
-		//xy = 3.0*xy;
-		vec2 tmp = vec2(xy);
 		
-		for(int i = 0; i<1000; i++) {
+		float escape_radius = 1390.0;
+		vec2 xy = vec2(gl_FragCoord.x/uCanvasW-0.5, gl_FragCoord.y/uCanvasH-0.5);
+		//xy = 10.0*exp(-0.0003*time)*xy+vec2(-0.7475,0.0741);
+		xy = 3.0*xy+vec2(-0.8,0.0); //Peruskuva.
+		//xy = *xy + vec2(-0.7575,0.0741);
+		vec2 tmp = vec2(xy);
+		int kie = int(floor(4.0*7.8));
+		int k;
+		for(int i = 0; i<70; i++) {
 			pow2(tmp,tmp);
 			tmp += xy;
+			if(length(tmp) > escape_radius) { 
+				k = i;
+				break;
+			}
 		}
 		
+		//float m = float(k) - log(log(escape_radius))/log(2.0);
+		//float col = m + log(log(length(xy)))/log(2.0);
+		
+		float col = float(k) + 1.0 - log(log(length(tmp)))/log(2.0);
 		//Mandelbrot-testi
 		
 		//Väri
 		
-		if(length(tmp) <= 2.0){
-			gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
+		if(length(tmp) <= escape_radius){
+			gl_FragColor = vec4(length(tmp)*88.0/255.0, length(tmp)*11.0/300.0, length(tmp)*28.0/300.0, 10.0);
 		}
 		
 		else{
-			gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+			gl_FragColor = vec4(1.5*0.04*col,1.5*0.02*col,1.5*0.02*col, 4.0);
 		}
         
        
@@ -324,7 +336,7 @@
 
 <body onload="webGLStart();">
 
-    <canvas id="lesson03-canvas" style="border: none;" width="500" height="500"></canvas>
+    <canvas id="lesson03-canvas" style="border: none;" width="1000" height="1000"></canvas>
 
 </body>
 
