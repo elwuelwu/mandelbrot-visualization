@@ -1,7 +1,8 @@
 <html>
 
 <head>
-<title>Learning WebGL &mdash; lesson 3</title>
+<title>Mandelbrot pärisee</title>
+<h1 style = "text-color: FFFFFF";>MANDELBROT</h1>
 <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
 
 <script type="text/javascript" src="glMatrix-0.9.5.min.js"></script>
@@ -12,7 +13,7 @@
     uniform float uCanvasW;
     uniform float uCanvasH;
     uniform float time;
-
+	uniform vec2 mouse;
 
     varying vec4 vColor;
     void pow2(in vec2 a, out vec2 b) {
@@ -21,15 +22,16 @@
 	//m = iter_count - log (log escape_radius) /log 2
     void main(void) {
 		
-		float escape_radius = 1390.0;
+		float escape_radius = 22.0;
 		vec2 xy = vec2(gl_FragCoord.x/uCanvasW-0.5, gl_FragCoord.y/uCanvasH-0.5);
+		vec2 mousexy = vec2(mouse.x/uCanvasW-0.5,mouse.y/uCanvasH-0.5);
+		//vec2 clicked = vec2(iMouse.z/uCanvasW-0.5, iMouse.w/uCanvasH-0.5);
 		//xy = 10.0*exp(-0.0003*time)*xy+vec2(-0.7475,0.0741);
-		xy = 3.0*xy+vec2(-0.8,0.0); //Peruskuva.
+		xy = 3.0*xy+vec2(-0.8,0.0)+mouse*100.0; //Peruskuva.
 		//xy = *xy + vec2(-0.7575,0.0741);
 		vec2 tmp = vec2(xy);
-		int kie = int(floor(4.0*7.8));
 		int k;
-		for(int i = 0; i<70; i++) {
+		for(int i = 0; i<400; i++) {
 			pow2(tmp,tmp);
 			tmp += xy;
 			if(length(tmp) > escape_radius) { 
@@ -37,7 +39,6 @@
 				break;
 			}
 		}
-		
 		//float m = float(k) - log(log(escape_radius))/log(2.0);
 		//float col = m + log(log(length(xy)))/log(2.0);
 		
@@ -77,7 +78,28 @@
 <script type="text/javascript">
 
     var gl;
-
+    var X;
+    var Y;
+	/*document.getElementById("lesson03-canvas").addEventListener("click", function getCursorPosition() {
+		var rect = canvas.getBoundingClientRect();
+		x = event.clientX - rect.left;
+		y = event.clientY - rect.top;
+		console.log("x: " + x + " y: " + y);
+	});*/
+	function get_mouse() {
+		$('lesson03-canvas').click(function(c){
+			X = Math.floor((c.pageX-$('lesson03-canvas').offset().left));
+			Y = Math.floor((c.pageY-$('lesson03-canvas').offset().top));
+			console.log("x: " + X + " y: " + Y);
+		});
+	}
+	/*function getCursorPosition(canvas, event) {
+		var rect = canvas.getBoundingClientRect();
+		X = event.clientX - rect.left;
+		Y = event.clientY - rect.top;
+		console.log("x: " + x + " y: " + y);
+	}*/
+	
     function initGL(canvas) {
         try {
             gl = canvas.getContext("experimental-webgl");
@@ -155,6 +177,7 @@
         shaderProgram.uCanvasW = gl.getUniformLocation(shaderProgram, "uCanvasW");
         shaderProgram.uCanvasH = gl.getUniformLocation(shaderProgram, "uCanvasH");
         shaderProgram.time = gl.getUniformLocation(shaderProgram, "time");
+        shaderProgram.mouse = gl.getUniformLocation(shaderProgram, "mouse");
     }
 
 
@@ -253,7 +276,8 @@
         var h = canvas.height;
         gl.uniform1f(shaderProgram.uCanvasW, w);
         gl.uniform1f(shaderProgram.uCanvasH, h);
-
+		//gl.uniform2f(shaderProgram.mouse,X,Y);
+		
         mat4.perspective(45, gl.viewportWidth / gl.viewportHeight, 0.1, 100.0, pMatrix);
 
         mat4.identity(mvMatrix);
@@ -334,9 +358,9 @@
 </head>
 
 
-<body onload="webGLStart();">
+<body onload="webGLStart();" style = "text-align:center;"  BGCOLOR = "505050">
 
-    <canvas id="lesson03-canvas" style="border: none;" width="1000" height="1000"></canvas>
+    <canvas id="lesson03-canvas" style="border: none;" width="750" height="750"></canvas>
 
 </body>
 
