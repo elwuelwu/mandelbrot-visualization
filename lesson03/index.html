@@ -9,11 +9,24 @@
 
 <script id="shader-fs" type="x-shader/x-fragment">
     precision mediump float;
+    uniform float uCanvasW;
+    uniform float uCanvasH;
+    uniform float time;
+
 
     varying vec4 vColor;
 
     void main(void) {
-        gl_FragColor = vec4(0.003*gl_FragCoord.x, 0.003*gl_FragCoord.y, 0.1, 1.0);
+		vec2 xy = vec2(gl_FragCoord.x/uCanvasW-0.5, gl_FragCoord.y/uCanvasH-0.5);
+		
+		if(xy.x*xy.x+xy.y*xy.y > 0.01*sin(0.00009*time)){
+			gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
+		}
+		
+		else{
+			gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+		}
+        
     }
 </script>
 
@@ -107,10 +120,13 @@
         gl.enableVertexAttribArray(shaderProgram.vertexPositionAttribute);
 
         shaderProgram.vertexColorAttribute = gl.getAttribLocation(shaderProgram, "aVertexColor");
-        gl.enableVertexAttribArray(shaderProgram.vertexColorAttribute);
+        //gl.enableVertexAttribArray(shaderProgram.vertexColorAttribute);
 
         shaderProgram.pMatrixUniform = gl.getUniformLocation(shaderProgram, "uPMatrix");
         shaderProgram.mvMatrixUniform = gl.getUniformLocation(shaderProgram, "uMVMatrix");
+        shaderProgram.uCanvasW = gl.getUniformLocation(shaderProgram, "uCanvasW");
+        shaderProgram.uCanvasH = gl.getUniformLocation(shaderProgram, "uCanvasH");
+        shaderProgram.time = gl.getUniformLocation(shaderProgram, "time");
     }
 
 
@@ -203,6 +219,12 @@
     function drawScene() {
         gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+        
+        var canvas = document.getElementById("lesson03-canvas");
+        var w = canvas.width;
+        var h = canvas.height;
+        gl.uniform1f(shaderProgram.uCanvasW, w);
+        gl.uniform1f(shaderProgram.uCanvasH, h);
 
         mat4.perspective(45, gl.viewportWidth / gl.viewportHeight, 0.1, 100.0, pMatrix);
 
@@ -233,7 +255,7 @@
         gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, squareVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
         gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexColorBuffer);
-        gl.vertexAttribPointer(shaderProgram.vertexColorAttribute, squareVertexColorBuffer.itemSize, gl.FLOAT, false, 0, 0);
+        //gl.vertexAttribPointer(shaderProgram.vertexColorAttribute, squareVertexColorBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
         setMatrixUniforms();
         gl.drawArrays(gl.TRIANGLE_STRIP, 0, squareVertexPositionBuffer.numItems);
@@ -243,20 +265,25 @@
 
 
     var lastTime = 0;
+    var timer = 0;
 
     function animate() {
         var timeNow = new Date().getTime();
         if (lastTime != 0) {
             var elapsed = timeNow - lastTime;
-
-            rTri += (90 * elapsed) / 1000.0;
-            rSquare += (75 * elapsed) / 1000.0;
+            timer += elapsed;
+            
+            gl.uniform1f(shaderProgram.time, timer);
+            
+            rTri +=0;
+            rSquare += 0;
         }
         lastTime = timeNow;
     }
 
 
     function tick() {
+		animate();
         requestAnimFrame(tick);
         drawScene();
     }
@@ -280,12 +307,9 @@
 
 
 <body onload="webGLStart();">
-    <a href="http://learningwebgl.com/blog/?p=239">&lt;&lt; Back to Lesson 3</a><br />
 
     <canvas id="lesson03-canvas" style="border: none;" width="500" height="500"></canvas>
 
-    <br/>
-    <a href="http://learningwebgl.com/blog/?p=239">&lt;&lt; Back to Lesson 3</a><br />
 </body>
 
 </html>
