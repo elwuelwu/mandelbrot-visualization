@@ -16,6 +16,7 @@
     uniform vec2 mouse;
     varying vec4 vColor;
     uniform float zoom;
+    uniform vec2 offset;
 
     void pow2(in vec2 a, out vec2 b) {
 		b = vec2(a.x*a.x-a.y*a.y, 2.0*a.x*a.y);
@@ -28,8 +29,8 @@
                 //vec2 mousexy = vec2(mouse.x/uCanvasW-0.5,mouse.y/uCanvasH-0.5)*exp(-0.0003*time);
 		//vec2 clicked = vec2(iMouse.z/uCanvasW-0.5, iMouse.w/uCanvasH-0.5);
 		//xy = 10.0*exp(-0.0003*time)*xy+vec2(-0.7475,0.0741);
-                xy = 3.0*xy + vec2(-0.8,0); //BASIC
-                // BASIC MOUSE ZOOM: xy = xy*exp(-0.0003*time)+mouse;
+                //xy = zoom*3.0*xy + vec2(-0.8,0); //BASIC
+                xy = 3.0*zoom*xy+offset;
                 
 
                 //xy = xy + mouse*(vec2(time,time)/(10000.0*mouse+vec2(time,time)));
@@ -183,6 +184,7 @@
         shaderProgram.time = gl.getUniformLocation(shaderProgram, "time");
         shaderProgram.zoom = gl.getUniformLocation(shaderProgram, "zoom");
         shaderProgram.mouse = gl.getUniformLocation(shaderProgram, "mouse");
+        shaderProgram.offset = gl.getUniformLocation(shaderProgram, "offset");
     }
 
 
@@ -269,10 +271,12 @@
 
 
 
-    var rTri = 0;
-    var rSquare = 0;
-    var mousepos = [0,0]
-    var zoomstatus = 0.0;
+    var rTri        = 0;
+    var rSquare     = 0;
+    var mousepos    = [0,0]
+    var zoomstatus  = 1.0;
+    var offset      = [-0.8,0]
+
 
     function drawScene() {
         gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
@@ -283,6 +287,7 @@
         gl.uniform1f(shaderProgram.uCanvasW, w);
         gl.uniform1f(shaderProgram.uCanvasH, h);
         gl.uniform1f(shaderProgram.zoom, zoomstatus);
+        gl.uniform2f(shaderProgram.offset,offset[0],offset[1]);
 	gl.uniform2f(shaderProgram.mouse,mousepos[0],mousepos[1]);
 
         mat4.perspective(45, gl.viewportWidth / gl.viewportHeight, 0.1, 100.0, pMatrix);
@@ -353,7 +358,6 @@
         initGL(canvas);
         initShaders()
         initBuffers();
-
         gl.clearColor(0.0, 0.0, 0.0, 1.0);
         gl.enable(gl.DEPTH_TEST);
 
@@ -370,16 +374,53 @@
     <canvas id="lesson03-canvas" style="border: none;" width="750" height="750"></canvas>
 
     <script>
-	document.getElementById("lesson03-canvas").addEventListener("click", function(event){
+       
+
+         document.getElementById("lesson03-canvas").oncontextmenu = function (e) {
+    		e.preventDefault();
+	};
+
+        document.addEventListener("keydown",function(keypress){
+                console.log(keypress);
+                if(keypress.keyCode == 65 && zoomstatus < 16) {
+                    zoomstatus = 2.0*zoomstatus;
+                }
+                if(keypress.keyCode == 70 && zoomstatus > 0.00005) {
+                    zoomstatus = zoomstatus/2.0;
+                }
+                if(keypress.keyCode == 38) { //keksi rajoitukset x ja y akseleille!
+                      offset[1] = offset[1] + 0.5*zoomstatus;//ylös
+                }
+                if(keypress.keyCode == 39) {
+                      offset[0] = offset[0] + 0.5*zoomstatus;
+                      //oikea
+                }
+                if(keypress.keyCode == 40) {
+                      offset[1] = offset[1] - 0.5*zoomstatus;
+                      //alas
+                }
+                if(keypress.keyCode == 37) {
+                      offset[0] = offset[0] - 0.5*zoomstatus;
+                      //vasen
+                }
+        });
+
+
+	document.getElementById("lesson03-canvas").addEventListener("mousedown", function(event){
             var w = this.width;
             var h = this.height;
 
             var x = event.clientX-this.offsetLeft; 
             var y = event.clientY-this.offsetTop;
-
-            console.log(event.button); 
-	    mousepos[0] += 2*(x*Math.exp(-0.0003*timer)/w-0.5*Math.exp(-0.0003*timer));
-	    mousepos[1] += -2*(y*Math.exp(-0.0003*timer)/h-0.5*Math.exp(-0.0003*timer));
+            if(event.which == 1 && zoomstatus > 0.00005) {  
+            zoomstatus = zoomstatus/2.0;
+            }
+            if(event.which == 3 && zoomstatus < 16) {
+                zoomstatus = 2.0*zoomstatus;
+            }
+            console.log(event.which); 
+	    mousepos[0] += 2*(x*zoomstatus/w-0.5*zoomstatus);
+	    mousepos[1] += -2*(y*zoomstatus/h-0.5*zoomstatus);
 	});
     </script>
 
