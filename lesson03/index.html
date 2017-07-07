@@ -22,7 +22,7 @@
 		b = vec2(a.x*a.x-a.y*a.y, 2.0*a.x*a.y);
 	}
 	//m = iter_count - log (log escape_radius) /log 2
-    void main(void) {	
+    void main(void) {
 		float escape_radius = 22.0;
 		vec2 xy = vec2(gl_FragCoord.x/uCanvasW-0.5, gl_FragCoord.y/uCanvasH-0.5);
 		vec2 mousexy = vec2(mouse.x/uCanvasW-0.5,mouse.y/uCanvasH-0.5);
@@ -30,13 +30,15 @@
 		//vec2 clicked = vec2(iMouse.z/uCanvasW-0.5, iMouse.w/uCanvasH-0.5);
 		//xy = 10.0*exp(-0.0003*time)*xy+vec2(-0.7475,0.0741);
                 //xy = zoom*3.0*xy + vec2(-0.8,0); //BASIC
-                xy = 3.0*zoom*xy+offset;
+                vec2 deltaxy = offset - xy;
+                //vec2 deltazoom = zoom 
+                xy = 3.0*zoom*xy+offset;//+deltaxy*(time/(100.0+time));
                 
 
                 //xy = xy + mouse*(vec2(time,time)/(10000.0*mouse+vec2(time,time)));
 		vec2 tmp = vec2(xy);
 		int k;
-		for(int i = 0; i<400; i++) {
+		for(int i = 0; i<500; i++) {
 			pow2(tmp,tmp);
 			tmp += xy;
 			if(length(tmp) > escape_radius) { 
@@ -382,27 +384,30 @@
 
         document.addEventListener("keydown",function(keypress){
                 console.log(keypress);
+                timer = 0;
                 if(keypress.keyCode == 65 && zoomstatus < 16) {
                     zoomstatus = 2.0*zoomstatus;
                 }
                 if(keypress.keyCode == 70 && zoomstatus > 0.00005) {
                     zoomstatus = zoomstatus/2.0;
                 }
-                if(keypress.keyCode == 38) { //keksi rajoitukset x ja y akseleille!
-                      offset[1] = offset[1] + 0.5*zoomstatus;//ylös
-                }
-                if(keypress.keyCode == 39) {
+                 
+
+                  if(keypress.keyCode == 38 && offset[1] < 3) { //keksi rajoitukset x ja y akseleille!
+                        offset[1] = offset[1] + 0.5*zoomstatus;//ylös
+                  }
+                  if(keypress.keyCode == 39 && offset[0] < 3) {
                       offset[0] = offset[0] + 0.5*zoomstatus;
                       //oikea
-                }
-                if(keypress.keyCode == 40) {
+                  }
+                  if(keypress.keyCode == 40 && offset[1] > -3) {
                       offset[1] = offset[1] - 0.5*zoomstatus;
                       //alas
-                }
-                if(keypress.keyCode == 37) {
+                  }
+                  if(keypress.keyCode == 37 && offset[0] > -3) {
                       offset[0] = offset[0] - 0.5*zoomstatus;
                       //vasen
-                }
+                  }
         });
 
 
