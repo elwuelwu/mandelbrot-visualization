@@ -23,9 +23,13 @@
 		float escape_radius = 22.0;
 		vec2 xy = vec2(gl_FragCoord.x/uCanvasW-0.5, gl_FragCoord.y/uCanvasH-0.5);
 		vec2 mousexy = vec2(mouse.x/uCanvasW-0.5,mouse.y/uCanvasH-0.5);
+                //vec2 mousexy = vec2(mouse.x/uCanvasW-0.5,mouse.y/uCanvasH-0.5)*exp(-0.0003*time);
 		//vec2 clicked = vec2(iMouse.z/uCanvasW-0.5, iMouse.w/uCanvasH-0.5);
 		//xy = 10.0*exp(-0.0003*time)*xy+vec2(-0.7475,0.0741);
-		xy = 10.0*exp(-0.00003*time)*(xy)+mouse; //Peruskuva.
+                xy = 3.0*xy + vec2(-0.8,0); //BASIC
+                xy = xy*exp(-0.0003*time)+mouse;
+                //xy = xy + mouse*(vec2(time,time)/(10000.0*mouse+vec2(time,time)));
+		//xy = 10.0*exp(-0.00006*time)*(xy)+mousexy;
 		//xy = *xy + vec2(-0.7575,0.0741);
 		vec2 tmp = vec2(xy);
 		int k;
@@ -369,8 +373,8 @@
             var x = event.clientX-this.offsetLeft; 
             var y = event.clientY-this.offsetTop;
 
-	    mousepos[0] += 2*(x/w-0.5);
-	    mousepos[1] += -2*(y/h-0.5);
+	    mousepos[0] += 2*(x*Math.exp(-0.0003*timer)/w-0.5*Math.exp(-0.0003*timer));
+	    mousepos[1] += -2*(y*Math.exp(-0.0003*timer)/h-0.5*Math.exp(-0.0003*timer));
 	});
     </script>
 
