@@ -14,20 +14,18 @@
     uniform float uCanvasH;
     uniform float time;
     uniform vec2 mouse;
-
     varying vec4 vColor;
     void pow2(in vec2 a, out vec2 b) {
 		b = vec2(a.x*a.x-a.y*a.y, 2.0*a.x*a.y);
 	}
 	//m = iter_count - log (log escape_radius) /log 2
-    void main(void) {
-		
+    void main(void) {	
 		float escape_radius = 22.0;
 		vec2 xy = vec2(gl_FragCoord.x/uCanvasW-0.5, gl_FragCoord.y/uCanvasH-0.5);
 		vec2 mousexy = vec2(mouse.x/uCanvasW-0.5,mouse.y/uCanvasH-0.5);
 		//vec2 clicked = vec2(iMouse.z/uCanvasW-0.5, iMouse.w/uCanvasH-0.5);
 		//xy = 10.0*exp(-0.0003*time)*xy+vec2(-0.7475,0.0741);
-		xy = 10.0*exp(-0.0003*time)*(mouse); //Peruskuva.
+		xy = 10.0*exp(-0.00003*time)*(xy)+mouse; //Peruskuva.
 		//xy = *xy + vec2(-0.7575,0.0741);
 		vec2 tmp = vec2(xy);
 		int k;
