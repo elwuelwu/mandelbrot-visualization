@@ -13,7 +13,7 @@
     uniform float uCanvasW;
     uniform float uCanvasH;
     uniform float time;
-	uniform vec2 mouse;
+    uniform vec2 mouse;
 
     varying vec4 vColor;
     void pow2(in vec2 a, out vec2 b) {
@@ -27,7 +27,7 @@
 		vec2 mousexy = vec2(mouse.x/uCanvasW-0.5,mouse.y/uCanvasH-0.5);
 		//vec2 clicked = vec2(iMouse.z/uCanvasW-0.5, iMouse.w/uCanvasH-0.5);
 		//xy = 10.0*exp(-0.0003*time)*xy+vec2(-0.7475,0.0741);
-		xy = 3.0*xy+vec2(-0.8,0.0)+mouse*100.0; //Peruskuva.
+		xy = 10.0*exp(-0.0003*time)*(mouse); //Peruskuva.
 		//xy = *xy + vec2(-0.7575,0.0741);
 		vec2 tmp = vec2(xy);
 		int k;
@@ -266,17 +266,18 @@
 
     var rTri = 0;
     var rSquare = 0;
+    var mousepos = [0,0]
+
 
     function drawScene() {
         gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-        
         var canvas = document.getElementById("lesson03-canvas");
         var w = canvas.width;
         var h = canvas.height;
         gl.uniform1f(shaderProgram.uCanvasW, w);
         gl.uniform1f(shaderProgram.uCanvasH, h);
-		//gl.uniform2f(shaderProgram.mouse,X,Y);
+	gl.uniform2f(shaderProgram.mouse,mousepos[0],mousepos[1]);
 		
         mat4.perspective(45, gl.viewportWidth / gl.viewportHeight, 0.1, 100.0, pMatrix);
 
@@ -361,6 +362,19 @@
 <body onload="webGLStart();" style = "text-align:center;"  BGCOLOR = "505050">
 
     <canvas id="lesson03-canvas" style="border: none;" width="750" height="750"></canvas>
+
+    <script>
+	document.getElementById("lesson03-canvas").addEventListener("click", function(event){
+            var w = this.width;
+            var h = this.height;
+
+            var x = event.clientX-this.offsetLeft; 
+            var y = event.clientY-this.offsetTop;
+
+	    mousepos[0] += 2*(x/w-0.5);
+	    mousepos[1] += -2*(y/h-0.5);
+	});
+    </script>
 
 </body>
 
