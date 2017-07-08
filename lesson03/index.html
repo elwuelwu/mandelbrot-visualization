@@ -1,4 +1,4 @@
-<html>
+<html style = "overflow-y: hidden; overflow-x: hidden">
 
 <head>
 <title>Mandelbrot pärisee</title>
@@ -22,8 +22,8 @@
 	}
 	//m = iter_count - log (log escape_radius) /log 2
     void main(void) {
-		float escape_radius = 22.0;
-		vec2 xy = vec2(gl_FragCoord.x/2000.0-0.5, gl_FragCoord.y/2000.0-0.7);
+		float escape_radius = 4.0;
+		vec2 xy = vec2(gl_FragCoord.x/2000.0-0.5, gl_FragCoord.y/2000.0-0.5);
 		//vec2 mousexy = vec2(mouse.x/uCanvasW-0.5,mouse.y/uCanvasH-0.5);
                 //vec2 mousexy = vec2(mouse.x/uCanvasW-0.5,mouse.y/uCanvasH-0.5)*exp(-0.0003*time);
 		//vec2 clicked = vec2(iMouse.z/uCanvasW-0.5, iMouse.w/uCanvasH-0.5);
@@ -54,11 +54,11 @@
 		//Väri
 		
 		if(length(tmp) <= escape_radius){
-			gl_FragColor = vec4(length(tmp)*11.0/300.0, length(tmp)*11.0/300.0, length(tmp)*11.0/300.0, length(tmp)*10.0);
+			gl_FragColor = vec4(length(tmp)*0.03667/3.0, length(tmp)*0.0333/3.0, length(tmp)*0.03333/3.0, length(tmp)*1.5+1.5);
 		}
 		
 		else{
-			gl_FragColor = vec4(1.5*0.005*col,1.5*0.005*col,1.5*0.005*col, 4.0);
+			gl_FragColor = vec4(1.5*0.0033*col,1.5*0.003*col,1.5*0.004*col, 4.0);
 		}
         
        
@@ -370,11 +370,10 @@
 </head>
 
 
-<body onload="webGLStart();" style = "text-align:center;"  BGCOLOR = "505050">
+<body onload="webGLStart();"  BGCOLOR = "505050">
 
-    <canvas id="lesson03-canvas" style="border: none;" width="2000" height="2000"></canvas>
-
-    <script>
+    <canvas id="lesson03-canvas" style = "position: absolute; left: 0px; top: 0px;" width = "2000" height = "2000"></canvas>
+	<script>
 		//width="200" height="200"
 		/*var ctx = document.querySelector('#lesson03-canvas').getContext('2d');
 		window.addEventListener('resize',function(){
