@@ -16,6 +16,7 @@
     varying vec4 vColor;
     uniform float zoom;
     uniform vec2 offset;
+    uniform float slidervalue;
 
     void pow2(in vec2 a, out vec2 b) {
 		b = vec2(a.x*a.x-a.y*a.y, 2.0*a.x*a.y);
@@ -28,7 +29,7 @@
 		int k;
 		for(int i = 0; i<700; i++) {
 			pow2(tmp,tmp);
-			tmp += xy;
+			tmp += (0.7885*cos(0.01*slidervalue), 0.7885*sin(0.01*slidervalue));
 			if(length(tmp) > escape_radius) { 
 				k = i;
 				break;
@@ -149,6 +150,7 @@
         shaderProgram.time = gl.getUniformLocation(shaderProgram, "time");
         shaderProgram.zoom = gl.getUniformLocation(shaderProgram, "zoom");
         shaderProgram.offset = gl.getUniformLocation(shaderProgram, "offset");
+        shaderProgram.slidervalue = gl.getUniformLocation(shaderProgram, "slidervalue");
     }
 
 
@@ -238,6 +240,7 @@
     var rTri        = 0;
     var rSquare     = 0;
     var zoomstatus  = 1.0;
+    var slidervalue = 0;
     var offset      = [-0.8,0]
 
 
@@ -252,6 +255,7 @@
         gl.uniform1f(shaderProgram.uCanvasW, w);
         gl.uniform1f(shaderProgram.uCanvasH, h);
         gl.uniform1f(shaderProgram.zoom, zoomstatus);
+        
         gl.uniform2f(shaderProgram.offset,offset[0],offset[1]);
 	
         mat4.perspective(45, gl.viewportWidth / gl.viewportHeight, 0.1, 100.0, pMatrix);
@@ -280,7 +284,7 @@
             timer += elapsed;
             
             gl.uniform1f(shaderProgram.time, timer);
-            
+            gl.uniform1f(shaderProgram.slidervalue, slidervalue);
             rTri +=0;
             rSquare += 0;
         }
@@ -312,7 +316,7 @@
 
 
 <body onload="webGLStart();">
-<canvas id="lesson03-canvas" style = "position: absolute; left: 0px; top: 0px;" width = "2000" height = "2000"></canvas>
+<canvas id="lesson03-canvas" style = "position: absolute; left: 500px; top: 300px;" width = "500" height = "500"></canvas>
 
 
 <script>
@@ -346,6 +350,68 @@ document.addEventListener("keydown",function(keypress){
 });
 </script>
 
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+.slidecontainer {
+  width: 100%;
+}
+
+.slider {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 15px;
+  border-radius: 5px;
+  background: #d3d3d3;
+  outline: none;
+  opacity: 0.7;
+  -webkit-transition: .2s;
+  transition: opacity .2s;
+}
+
+.slider:hover {
+  opacity: 1;
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  background: #04AA6D;
+  cursor: pointer;
+}
+
+.slider::-moz-range-thumb {
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  background: #04AA6D;
+  cursor: pointer;
+}
+</style>
+</head>
+<body>
+
+<div class="slidecontainer">
+  <input type="range" min="1" max="1000" value="50" class="slider" id="myRange">
+  <p>Value: <span id="demo"></span></p>
+</div>
+
+<script>
+var slider = document.getElementById("myRange");
+var output = document.getElementById("demo");
+output.innerHTML = slider.value;
+
+slider.oninput = function() {
+  output.innerHTML = this.value;
+  slidervalue = this.value;
+  console.log(slidervalue);
+}
+</script>
+    
+    
+    
 </body>
 
 </html>
